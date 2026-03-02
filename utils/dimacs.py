@@ -2,17 +2,24 @@
 # APTO Piotr Faliszewski 2018
 # Load graph in the DIMACS ascii format
 
+import os
 
+GRAPH_DIR = os.path.join(os.path.dirname(__file__), "..", "graphs")
+
+def get_graph_path( name ):
+  return os.path.join(GRAPH_DIR, name)
 
 def loadGraph( name ):
-  """Load a graph in the DIMACS ascii format from 
+  """Load a graph in the DIMACS ascii format from
      the file "name" and return it as a list of sets"""
 
   V = 0
   E = 0
-  G = []  
+  G = []
 
-  f = open( name, "r" )
+  graph_path = get_graph_path( name )
+
+  f = open( graph_path, "r" )
   lines = f.readlines()
   for l in lines:
     s = l.split()
@@ -29,20 +36,21 @@ def loadGraph( name ):
       G[y].add(x)
 
   f.close()
-  return G 
+  return G
 
 
 
 
 def loadGRGraph( name ):
-  """Load a graph in the DIMACS GR ascii format from 
+  """Load a graph in the DIMACS GR ascii format from
      the PACE-2016 competition"""
 
   V = 0
   E = 0
   G = []
+  graph_path = get_graph_path( name )
 
-  f = open( name, "r" )
+  f = open( graph_path, "r" )
   lines = f.readlines()
   for l in lines:
     s = l.split()
@@ -59,7 +67,7 @@ def loadGRGraph( name ):
       G[y].add(x)
 
   f.close()
-  return G 
+  return G
 
 
 
@@ -88,8 +96,9 @@ def loadDecomposition( name ):
   B = 0    # number of bags
   TW = 0
   Bags = []
+  graph_path = get_graph_path( name )
 
-  f = open( name, "r" )
+  f = open( graph_path, "r" )
   lines = f.readlines()
   for l in lines:
     s = l.split()
@@ -104,15 +113,15 @@ def loadDecomposition( name ):
       b = int(s[1])
       l = set([int(x) for x in s[2:]])
       Bags[b].bag = l
-    else: 
+    else:
       (x,y) = (int(s[0]), int(s[1]))
       Bags[x].children.add(y)
       Bags[y].children.add(x)
-      
+
   f.close()
   setParents( Bags, 1 )
-  
-  return Bags 
+
+  return Bags
 
 
 
@@ -134,7 +143,7 @@ def saveGraph( name, G, comment ):
   for (x,y) in E:
     f.write( "e %d %d\n" % (x,y) )
 
-  
+
 
 
 def loadX3C( name ):
@@ -142,15 +151,16 @@ def loadX3C( name ):
      n elements
      s set1
      s set2
-     ... 
+     ...
      s last set
 
      Return a pair (elements, list of sets) where each set is a list and the set at index 0 is a dummy empty set"""
 
   n = 0
   sets = []
+  graph_path = get_graph_path( name )
 
-  f = open( name, "r" )
+  f = open( graph_path, "r" )
   lines = f.readlines()
   for l in lines:
     s = l.split()
@@ -166,7 +176,7 @@ def loadX3C( name ):
   f.close()
   return (n, sets)
 
-    
+
 
 
 
@@ -186,7 +196,7 @@ def edgeList( G ):
 
 def isVC( E, C ):
   """checks if C is a vertex cover for graph E
-     C -- set of vertices 
+     C -- set of vertices
      E -- graph represented as a list of edges
      returns True/False"""
   for (x,y) in E:
@@ -206,14 +216,15 @@ def saveSolution( name, C ):
 
 
 def loadCNF( name ):
-  """Load a graph in the DIMACS ascii format from 
+  """Load a graph in the DIMACS ascii format from
      the file "name" and return it as a pair (n, CNF),
      where n is the number of variables and CNF is the formula"""
 
   n = 0
-  CNF = []  
+  CNF = []
+  graph_path = get_graph_path( name )
 
-  f = open( name, "r" )
+  f = open( graph_path, "r" )
   lines = f.readlines()
   for l in lines:
     s = l.split()
@@ -227,11 +238,11 @@ def loadCNF( name ):
       CNF += [C[:-1]]
 
   f.close()
-  return (n,CNF) 
+  return (n,CNF)
 
 
 
-  
+
 
 def saveCNF( name, cnf ):
   """save formula cnf to the file name in DIMACS ascii format"""
@@ -241,10 +252,10 @@ def saveCNF( name, cnf ):
 
   # header
   f.write("p cnf %d %d\n" % (nbvars, nbclauses))
-  
+
   # clauses
-  for C in cnf: 
-    s = "" 
+  for C in cnf:
+    s = ""
     for x in C:
       s += str(x) + " "
     s += "0\n"
